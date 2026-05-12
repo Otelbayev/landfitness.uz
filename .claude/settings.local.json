@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\Jasurbek\\\\Desktop\\\\landfitness.uz\\\\public\\\\images\\\\placeholder.jpg\" -ErrorAction SilentlyContinue)",
+      "Bash(Write-Output \"removed\")",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\Jasurbek\\\\Desktop\\\\landfitness.uz\\\\public\\\\images\" -Recurse)",
+      "Bash(Select-Object FullName, Length)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Jasurbek\\\\Desktop\\\\landfitness.uz\\\\app\\\\[locale]\\\\coaches\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Jasurbek\\\\Desktop\\\\landfitness.uz\\\\app\\\\[locale]\\\\contact\")",
+      "Bash(npx next *)"
+    ]
+  }
+}

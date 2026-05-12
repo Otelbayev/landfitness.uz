@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── Design tokens ───────────────────────────────────────── */
+:root {
+  --bg:        #f5f2eb;
+  --bg-2:      #edeadf;
+  --bg-card:   #ffffff;
+  --fg:        #0a0906;
+  --fg-2:      #2e2b25;
+  --fg-muted:  #6f6b62;
+  --border:    rgba(0,0,0,0.08);
+  --border-2:  rgba(0,0,0,0.04);
+  --gold:       #c9a227;
+  --gold-dark:  #9e7d18;
+  --gold-light: #e8c84a;
+  --gold-dim:   rgba(201,162,39,0.12);
+  --nav-bg:    rgba(245,242,235,0.92);
+  --shadow:    0 1px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.10);
+  --glow:      0 0 60px rgba(201,162,39,0.20);
+}
+
+.dark {
+  --bg:        #080706;
+  --bg-2:      #0f0d0a;
+  --bg-card:   #131109;
+  --fg:        #f5f1e7;
+  --fg-2:      #c8c2b0;
+  --fg-muted:  #65604f;
+  --border:    rgba(255,255,255,0.07);
+  --border-2:  rgba(255,255,255,0.03);
+  --gold:       #c9a227;
+  --gold-dark:  #9e7d18;
+  --gold-light: #e8c84a;
+  --gold-dim:   rgba(201,162,39,0.10);
+  --nav-bg:    rgba(8,7,6,0.94);
+  --shadow:    0 2px 20px rgba(0,0,0,0.50);
+  --shadow-lg: 0 8px 48px rgba(0,0,0,0.70);
+  --glow:      0 0 80px rgba(201,162,39,0.15);
+}
+
+@theme inline {
+  --color-bg:         var(--bg);
+  --color-bg2:        var(--bg-2);
+  --color-card:       var(--bg-card);
+  --color-fg:         var(--fg);
+  --color-fg2:        var(--fg-2);
+  --color-muted:      var(--fg-muted);
+  --color-border:     var(--border);
+  --color-gold:       var(--gold);
+  --color-gold-dark:  var(--gold-dark);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dim:   var(--gold-dim);
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+/* NOTE: margin/padding reset is handled by Tailwind preflight in @layer base.
+   Duplicating it here as unlayered CSS would override all Tailwind margin/padding utilities. */
+
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display, var(--font-body, system-ui, sans-serif));
+}
+
+img { display: block; max-width: 100%; }
+
+/* ── Gold gradient text ──────────────────────────────────── */
+.gold-text {
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Section padding ─────────────────────────────────────── */
+.section-pad { padding-top: 6rem; padding-bottom: 6rem; }
+@media (min-width: 768px) { .section-pad { padding-top: 9rem; padding-bottom: 9rem; } }
+
+/* ── Card ────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+/* ── Form inputs ─────────────────────────────────────────── */
+.form-input {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  color: var(--fg);
+  padding: 14px 18px;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.form-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-dim);
+}
+.form-input::placeholder { color: var(--fg-muted); }
+
+/* ── Marquee ─────────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-inner {
+  animation: marquee 32s linear infinite;
+  will-change: transform;
+}
+.marquee-inner:hover { animation-play-state: paused; }
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar          { width: 4px; }
+::-webkit-scrollbar-track    { background: var(--bg); }
+::-webkit-scrollbar-thumb    { background: var(--gold-dark); border-radius: 99px; }
