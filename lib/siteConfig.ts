@@ -3,8 +3,8 @@
 // ============================================================
 
 export type Locale = "uz" | "ru";
-export const locales: Locale[] = ["uz", "ru"];
-export const defaultLocale: Locale = "uz";
+export const locales: Locale[] = ["ru", "uz"];
+export const defaultLocale: Locale = "ru";
 
 // ─── BRANCHES ────────────────────────────────────────────────
 export const branches = [
@@ -40,7 +40,7 @@ export const branches = [
     mapUrl: "https://yandex.uz/maps/-/CPc~RTp2",
     mapEmbed: "https://yandex.uz/map-widget/v1/-/CPc~RTp2",
     hours: "24/7",
-    bgImage: "/images/filial2/bg.jpg",
+    bgImage: "/images/filial2/bg1.png",
     images: [
       "/images/filial2/1.webp",
       "/images/filial2/2.png",

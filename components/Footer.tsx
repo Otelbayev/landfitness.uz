@@ -91,31 +91,20 @@ export default function Footer({ locale, footer }: Props) {
             </p>
             <div className="flex flex-col gap-2.5">
               {[
-                { href: "#branches",          uz: "Filiallar",   ru: "Филиалы",  page: false },
-                { href: "#pricing",           uz: "Narxlar",     ru: "Цены",     page: false },
-                { href: `/${locale}/coaches`, uz: "Murabbiylar", ru: "Тренеры",  page: true  },
-                { href: `/${locale}/contact`, uz: "Aloqa",       ru: "Контакты", page: true  },
-              ].map(l =>
-                l.page ? (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    className="text-sm transition-colors hover:text-gold"
-                    style={{ color: "var(--fg-muted)" }}
-                  >
-                    {locale === "uz" ? l.uz : l.ru}
-                  </Link>
-                ) : (
-                  <a
-                    key={l.href}
-                    href={l.href}
-                    className="text-sm transition-colors hover:text-gold"
-                    style={{ color: "var(--fg-muted)" }}
-                  >
-                    {locale === "uz" ? l.uz : l.ru}
-                  </a>
-                )
-              )}
+                { href: `/${locale}#branches`, uz: "Filiallar",   ru: "Филиалы"  },
+                { href: `/${locale}#pricing`,  uz: "Narxlar",     ru: "Цены"     },
+                { href: `/${locale}/coaches`,  uz: "Murabbiylar", ru: "Тренеры"  },
+                { href: `/${locale}/contact`,  uz: "Aloqa",       ru: "Контакты" },
+              ].map(l => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="text-sm transition-colors hover:text-gold"
+                  style={{ color: "var(--fg-muted)" }}
+                >
+                  {locale === "uz" ? l.uz : l.ru}
+                </Link>
+              ))}
               <Link
                 href={locale === "uz" ? "/ru" : "/uz"}
                 className="text-sm transition-colors hover:text-gold mt-0.5"

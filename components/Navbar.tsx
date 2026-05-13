@@ -8,12 +8,13 @@ import type { Locale } from "@/lib/siteConfig";
 import type { Dict } from "@/lib/i18n";
 
 type Props = { locale: Locale; nav: Dict["nav"] };
+type ThemeMode = "auto" | "light" | "dark";
 
 const LINKS = (nav: Dict["nav"], locale: string) => [
-  { href: "#branches",          label: nav.branches, page: false },
-  { href: "#pricing",           label: nav.pricing,  page: false },
-  { href: `/${locale}/coaches`, label: nav.coaches,  page: true  },
-  { href: `/${locale}/contact`, label: nav.contact,  page: true  },
+  { href: `/${locale}#branches`, label: nav.branches },
+  { href: `/${locale}#pricing`,  label: nav.pricing  },
+  { href: `/${locale}/coaches`,  label: nav.coaches  },
+  { href: `/${locale}/contact`,  label: nav.contact  },
 ];
 
 const SunIcon = () => (
@@ -30,6 +31,21 @@ const MoonIcon = () => (
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
   </svg>
 );
+const AutoIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>
+  </svg>
+);
+
+/** Day = light (07:00 – 18:59), night = dark */
+const isNightNow = () => {
+  const h = new Date().getHours();
+  return h < 7 || h >= 19;
+};
+
+const resolveDark = (mode: ThemeMode) =>
+  mode === "dark" ? true : mode === "light" ? false : isNightNow();
 
 export default function Navbar({ locale, nav }: Props) {
   const pathname = usePathname();
@@ -38,9 +54,30 @@ export default function Navbar({ locale, nav }: Props) {
 
   const [scrolled, setScrolled] = useState(false);
   const [open,     setOpen]     = useState(false);
+  const [mode,     setMode]     = useState<ThemeMode>("auto");
   const [dark,     setDark]     = useState(false);
 
-  useEffect(() => { setDark(document.documentElement.classList.contains("dark")); }, []);
+  // Hydrate stored preference, then sync DOM
+  useEffect(() => {
+    const stored = (localStorage.getItem("lf-theme") as ThemeMode | null) ?? "auto";
+    const m: ThemeMode = stored === "light" || stored === "dark" ? stored : "auto";
+    setMode(m);
+    const d = resolveDark(m);
+    setDark(d);
+    document.documentElement.classList.toggle("dark", d);
+  }, []);
+
+  // In auto mode, re-check every minute so it flips at the day/night boundary
+  useEffect(() => {
+    if (mode !== "auto") return;
+    const tick = () => {
+      const d = isNightNow();
+      setDark(d);
+      document.documentElement.classList.toggle("dark", d);
+    };
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, [mode]);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);
@@ -54,12 +91,24 @@ export default function Navbar({ locale, nav }: Props) {
     return () => window.removeEventListener("resize", fn);
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("lf-theme", next ? "dark" : "light");
-  }, [dark]);
+  // Cycle: auto → light → dark → auto
+  const cycleTheme = useCallback(() => {
+    const next: ThemeMode = mode === "auto" ? "light" : mode === "light" ? "dark" : "auto";
+    setMode(next);
+    const d = resolveDark(next);
+    setDark(d);
+    document.documentElement.classList.toggle("dark", d);
+    if (next === "auto") localStorage.removeItem("lf-theme");
+    else localStorage.setItem("lf-theme", next);
+  }, [mode]);
+
+  const themeIcon = mode === "auto" ? <AutoIcon /> : dark ? <SunIcon /> : <MoonIcon />;
+  const themeLabel =
+    mode === "auto"
+      ? locale === "uz" ? "Avto" : "Авто"
+      : dark
+        ? "Light"
+        : "Dark";
 
   const links = LINKS(nav, locale);
 
@@ -90,20 +139,16 @@ export default function Navbar({ locale, nav }: Props) {
 
         {/* Desktop links */}
         <nav className="hidden md:flex items-center gap-0.5">
-          {links.map((l) => {
-            const cls =
-              "relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/10";
-            const style = { color: scrolled ? "var(--fg-2)" : "rgba(255,255,255,0.75)" };
-            return l.page ? (
-              <Link key={l.href} href={l.href} className={cls} style={style}>
-                {l.label}
-              </Link>
-            ) : (
-              <a key={l.href} href={l.href} className={cls} style={style}>
-                {l.label}
-              </a>
-            );
-          })}
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/10"
+              style={{ color: scrolled ? "var(--fg-2)" : "rgba(255,255,255,0.75)" }}
+            >
+              {l.label}
+            </Link>
+          ))}
         </nav>
 
         {/* Right controls */}
@@ -120,17 +165,18 @@ export default function Navbar({ locale, nav }: Props) {
             {other.toUpperCase()}
           </Link>
 
-          {/* Theme */}
+          {/* Theme — cycles auto → light → dark */}
           <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
+            onClick={cycleTheme}
+            aria-label={`Theme: ${mode}`}
+            title={mode === "auto" ? (locale === "uz" ? "Avto (vaqt bo'yicha)" : "Авто (по времени)") : mode}
             className="w-9 h-9 flex items-center justify-center rounded-xl border transition-all duration-200 hover:border-gold"
             style={{
               borderColor: scrolled ? "var(--border)" : "rgba(255,255,255,0.22)",
               color:       scrolled ? "var(--fg)"     : "#fff",
             }}
           >
-            {dark ? <SunIcon /> : <MoonIcon />}
+            {themeIcon}
           </button>
 
           {/* Hamburger */}
@@ -177,36 +223,23 @@ export default function Navbar({ locale, nav }: Props) {
             }}
           >
             <div className="max-w-7xl mx-auto px-5 py-5 flex flex-col gap-1">
-              {links.map((l, i) => {
-                const cls =
-                  "block px-4 py-3 rounded-xl text-base font-medium transition-colors hover:bg-[var(--bg-2)]";
-                const style = { color: "var(--fg)" };
-                return l.page ? (
-                  <motion.div
-                    key={l.href}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
-                    <Link href={l.href} onClick={() => setOpen(false)} className={cls} style={style}>
-                      {l.label}
-                    </Link>
-                  </motion.div>
-                ) : (
-                  <motion.a
-                    key={l.href}
+              {links.map((l, i) => (
+                <motion.div
+                  key={l.href}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <Link
                     href={l.href}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
                     onClick={() => setOpen(false)}
-                    className={cls}
-                    style={style}
+                    className="block px-4 py-3 rounded-xl text-base font-medium transition-colors hover:bg-[var(--bg-2)]"
+                    style={{ color: "var(--fg)" }}
                   >
                     {l.label}
-                  </motion.a>
-                );
-              })}
+                  </Link>
+                </motion.div>
+              ))}
 
               <div
                 className="pt-3 mt-1 border-t flex items-center justify-between"
@@ -221,12 +254,12 @@ export default function Navbar({ locale, nav }: Props) {
                   {other.toUpperCase()}
                 </Link>
                 <button
-                  onClick={toggleTheme}
+                  onClick={cycleTheme}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm border transition-all hover:border-gold hover:text-gold"
                   style={{ borderColor: "var(--border)", color: "var(--fg-muted)" }}
                 >
-                  {dark ? <SunIcon /> : <MoonIcon />}
-                  {dark ? "Light" : "Dark"}
+                  {themeIcon}
+                  {themeLabel}
                 </button>
               </div>
             </div>

@@ -78,9 +78,9 @@ function CoachCard({ c, locale, tr, idx }: { c: Coach; locale: Locale; tr: Dict[
       </div>
 
       {/* Info */}
-      <div className="px-4 pb-4 pt-1 sm:px-5 sm:pb-5">
+      <div className="px-4 pb-5 pt-2 sm:px-5 sm:pb-6 lg:px-6 lg:pb-7">
         <h3
-          className="text-sm font-bold mb-3 leading-snug"
+          className="text-base sm:text-lg lg:text-xl font-bold mb-4 leading-snug"
           style={{ color: "var(--fg)" }}
         >
           {name}
@@ -88,20 +88,20 @@ function CoachCard({ c, locale, tr, idx }: { c: Coach; locale: Locale; tr: Dict[
 
         {/* Schedule label */}
         <p
-          className="text-[10px] font-bold uppercase tracking-widest mb-2"
+          className="text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2.5"
           style={{ color: "var(--fg-muted)" }}
         >
           {tr.schedule}
         </p>
 
         {/* Days */}
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-1.5 flex-wrap">
           {tr.days.map((day, di) => {
             const active = c.days.includes(di);
             return (
               <span
                 key={di}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-[11px] font-bold transition-colors"
+                className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center rounded-lg text-xs font-bold transition-colors"
                 style={
                   active
                     ? { background: "var(--gold)", color: "#000" }
@@ -153,7 +153,7 @@ export default function Coaches({ locale, data, tr }: Props) {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7">
           {data.map((c, i) => (
             <CoachCard key={c.id} c={c} locale={locale} tr={tr} idx={i} />
           ))}
